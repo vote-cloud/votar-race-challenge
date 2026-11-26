@@ -1,193 +1,231 @@
-<!doctype html>
-<html lang="es">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#071411">
-  <title>Votar — Emite tu voto</title>
-  <style>
-    :root {
-      --cyan: #24dfd2;
-      --pink: #f32e61;
-      --muted: #c4c3c7;
-      --panel: rgba(18, 20, 20, .83);
-      --border: rgba(205, 220, 218, .22);
-    }
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 28px;
-      color: #f8f8fa;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(ellipse at 8% 5%, rgba(0, 91, 76, .26), transparent 38%),
-        radial-gradient(ellipse at 93% 94%, rgba(111, 15, 42, .22), transparent 35%),
-        linear-gradient(130deg, #061411 0%, #030707 48%, #090304 100%);
-    }
-    .panel {
-      width: min(100%, 780px);
-      padding: 44px 44px 46px;
-      border: 1.5px solid var(--border);
-      border-radius: 44px;
-      background: linear-gradient(135deg, rgba(22, 31, 30, .88), var(--panel) 48%, rgba(34, 17, 22, .88));
-      box-shadow: 0 24px 90px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.035);
-      text-align: center;
-    }
-    .translate {
-      width: min(100%, 560px);
-      min-height: 88px;
-      margin: 0 auto 34px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 14px;
-      padding: 18px 34px;
-      border: 2px solid rgba(210,220,220,.32);
-      border-radius: 999px;
-      color: #f4f4f5;
-      background: rgba(255,255,255,.075);
-      font-size: clamp(19px, 3.4vw, 27px);
-      text-align: left;
-    }
-    .globe { font-size: 31px; line-height: 1; }
-    .brand {
-      margin: 0 0 38px;
-      font-size: clamp(30px, 5vw, 43px);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: -.8px;
-      background: linear-gradient(100deg, #88c9d7, #b7a0c6 55%, #f0a1b7);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .brand span { margin-right: 12px; color: #91bdc9; -webkit-text-fill-color: #91bdc9; }
-    h1 {
-      margin: 0 0 30px;
-      font-size: clamp(30px, 5.5vw, 46px);
-      line-height: 1.12;
-      letter-spacing: -.8px;
-      font-weight: 800;
-    }
-    .intro {
-      max-width: 650px;
-      margin: 0 auto 54px;
-      color: var(--muted);
-      font-size: clamp(18px, 3.4vw, 28px);
-      line-height: 1.42;
-    }
-    .actions { display: grid; gap: 38px; }
-    .vote-button {
-      min-height: 100px;
-      width: 100%;
-      padding: 20px 24px;
-      border: 0;
-      border-radius: 34px;
-      color: #050707;
-      background: linear-gradient(105deg, #24e0d4 0%, #80b8c3 46%, #f32d61 100%);
-      font: inherit;
-      font-size: clamp(19px, 3.5vw, 29px);
-      font-weight: 800;
-      line-height: 1.28;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0,0,0,.16);
-      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
-    }
-    .vote-button:hover { transform: translateY(-3px); filter: brightness(1.07); box-shadow: 0 12px 30px rgba(0,0,0,.24); }
-    .vote-button:active { transform: translateY(0); }
-    .vote-button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
-    .footer {
-      margin: 34px 0 0;
-      color: #aaa7aa;
-      font-size: clamp(16px, 2.8vw, 23px);
-      line-height: 1.45;
-    }
-    .footer .dot { padding: 0 5px; color: #8d898d; }
-    .notice {
-      display: none;
-      margin: 24px 0 0;
-      padding: 16px 18px;
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 16px;
-      color: #e8e7e9;
-      background: rgba(0,0,0,.3);
-      font-size: 15px;
-      line-height: 1.5;
-    }
-    .notice.show { display: block; }
-    @media (max-width: 600px) {
-      body { padding: 18px; }
-      .panel { padding: 28px 20px 30px; border-radius: 30px; }
-      .translate { min-height: 66px; padding: 12px 22px; margin-bottom: 30px; }
-      .brand { margin-bottom: 32px; }
-      h1 { margin-bottom: 24px; }
-      .intro { margin-bottom: 36px; }
-      .actions { gap: 22px; }
-      .vote-button { min-height: 82px; border-radius: 26px; padding: 17px 14px; }
-      .footer { margin-top: 28px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOTAR RACE CHALLENGE</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090d18;color:white;font-family:Arial,sans-serif;padding:25px 16px}
+main{max-width:650px;margin:auto}
+header{text-align:center;padding:35px 10px}
+h1{font-size:32px;letter-spacing:2px;background:linear-gradient(90deg,#20e5d1,#fa5da8);color:transparent;background-clip:text}
+.subtitle{color:#aab4c8}
+.panel{background:#151d2e;border:1px solid #29364b;border-radius:18px;padding:22px;margin:18px 0}
+h2{font-size:20px}
+label{display:block;margin:15px 0 7px;color:#cbd5e1}
+input,select{width:100%;padding:14px;border-radius:10px;border:1px solid #39465c;background:#0d1423;color:white;font-size:16px}
+button{width:100%;padding:15px;border:0;border-radius:12px;margin-top:17px;background:linear-gradient(90deg,#19d9cf,#ed55a5);font-weight:bold;font-size:16px;color:#07111c}
+button:disabled{opacity:.5}
+.small{font-size:13px;color:#aab4c8;line-height:1.6}
+#message{margin-top:15px;line-height:1.5}
+.nominee{padding:12px;border-bottom:1px solid #29364b}
+a{color:#29ded2}
+.hidden{display:none}
+</style>
 </head>
 <body>
-  <main class="panel">
-    <div class="translate" aria-label="Traducir página">
-      <span class="globe" aria-hidden="true">🌍</span>
-      <span>Traducir página</span>
-    </div>
+<main>
+<header>
+<h1>VOTAR RACE CHALLENGE</h1>
+<p class="subtitle">Choose your favourite contestant and cast your vote!</p>
+</header>
 
-    <div class="brand"><span aria-hidden="true">♪</span>Votar</div>
-    <h1>Emitir Su Voto</h1>
-    <p class="intro">Tu opinión importa. Elija una opción a continuación y ayude a dar forma al resultado.</p>
+<section class="panel">
+<h2>🏆 Cast Your Vote</h2>
+<form id="voteForm">
+<label>Your name</label>
+<input id="voterName" required placeholder="Enter your name">
 
-    <div class="actions">
-      <button class="vote-button" id="instagramVote" type="button">Completar La Votación En Instagram</button>
-      <button class="vote-button" id="emailVote" type="button">Completar La Votación Por Correo<br class="desktop-break"> Electrónico</button>
-    </div>
+<label>Choose your contestant</label>
+<select id="nominee" required>
+<option value="">Loading contestants...</option>
+</select>
 
-    <p class="footer">La votación es anónima <span class="dot">·</span> Actualización de resultados en tiempo real</p>
-    <div class="notice" id="notice" role="status" aria-live="polite"></div>
-  </main>
+<label>Choose voting method</label>
+<select id="method" required>
+<option value="">Select a method</option>
+<option value="Instagram">Instagram</option>
+<option value="Email">Email</option>
+</select>
 
-  <script>
-    /*
-      CONFIGURACIÓN:
-      1. Pega el enlace real de tu encuesta de Instagram en INSTAGRAM_VOTE_URL.
-      2. Añade el correo que recibirá los votos en VOTE_EMAIL.
-      Los botones mostrarán un aviso hasta que configures estos datos.
-    */
-    const INSTAGRAM_VOTE_URL = "";
-    const VOTE_EMAIL = "";
+<label id="contactLabel">Instagram username or email address</label>
+<input id="contact" required placeholder="Enter your Instagram username or email">
 
-    const notice = document.getElementById("notice");
-    function showNotice(message) {
-      notice.textContent = message;
-      notice.classList.add("show");
-    }
+<p class="small">We will never ask for your Instagram or email password. Email verification must be completed separately before an email vote can be treated as verified.</p>
 
-    document.getElementById("instagramVote").addEventListener("click", () => {
-      if (INSTAGRAM_VOTE_URL.trim()) {
-        window.open(INSTAGRAM_VOTE_URL, "_blank", "noopener,noreferrer");
-      } else {
-        showNotice("El enlace de votación de Instagram aún no está configurado. Añade tu enlace en INSTAGRAM_VOTE_URL dentro del código para activar este botón.");
-      }
-    });
+<button id="submitVote" type="submit">SUBMIT MY VOTE</button>
+</form>
+<div id="message"></div>
+</section>
 
-    document.getElementById("emailVote").addEventListener("click", () => {
-      if (VOTE_EMAIL.trim()) {
-        const subject = encodeURIComponent("Mi voto");
-        const body = encodeURIComponent("Mi voto es: ");
-        window.location.href = `mailto:${VOTE_EMAIL}?subject=${subject}&body=${body}`;
-      } else {
-        showNotice("El correo que recibirá los votos aún no está configurado. Añade tu dirección en VOTE_EMAIL dentro del código para activar este botón.");
-      }
-    });
-  </script>
+<section class="panel">
+<h2>📊 Live Vote Totals</h2>
+<div id="totals">Loading totals...</div>
+</section>
+
+<section class="panel">
+<h2>🔐 Admin Dashboard</h2>
+<p class="small">For authorised VOTAR administrators only.</p>
+<form id="loginForm">
+<label>Admin email</label>
+<input id="adminEmail" type="email" required>
+<label>Admin password</label>
+<input id="adminPassword" type="password" required>
+<button type="submit">ADMIN LOGIN</button>
+</form>
+<div id="adminArea" class="hidden">
+<h2>Submitted Votes</h2>
+<div id="votesList">Loading...</div>
+<label>Add a contestant</label>
+<input id="newNominee" placeholder="Contestant name">
+<button id="addNominee">ADD CONTESTANT</button>
+<button id="logout">LOG OUT</button>
+</div>
+<div id="adminMessage"></div>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL = "https://jybkpokdfiwogszauvnm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_9S0btlgPV_AExggBMffpOA_V99RyRrP";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const nomineeSelect = document.getElementById("nominee");
+const message = document.getElementById("message");
+
+async function loadNominees(){
+  const {data,error} = await db.from("nominees").select("id,name").order("created_at");
+  if(error){
+    nomineeSelect.innerHTML='<option value="">Could not load contestants</option>';
+    return;
+  }
+  nomineeSelect.innerHTML='<option value="">Choose contestant</option>';
+  data.forEach(n=>{
+    const option=document.createElement("option");
+    option.value=n.id;
+    option.textContent=n.name;
+    nomineeSelect.appendChild(option);
+  });
+}
+
+async function loadTotals(){
+  const {data,error}=await db.rpc("get_vote_totals");
+  const area=document.getElementById("totals");
+  if(error){area.textContent="Vote totals are temporarily unavailable.";return;}
+  const {data:nominees}=await db.from("nominees").select("id,name");
+  area.innerHTML="";
+  (nominees||[]).forEach(n=>{
+    const item=document.createElement("div");
+    item.className="nominee";
+    const total=(data||[]).find(v=>String(v.nominee_id)===String(n.id));
+    item.textContent=n.name+" — "+(total?total.total_votes:0)+" votes";
+    area.appendChild(item);
+  });
+}
+
+document.getElementById("method").addEventListener("change",e=>{
+  const email=e.target.value==="Email";
+  document.getElementById("contactLabel").textContent=
+    email?"Email address":"Instagram username";
+  document.getElementById("contact").placeholder=
+    email?"Enter your email address":"Enter your Instagram username";
+  document.getElementById("contact").type=email?"email":"text";
+});
+
+document.getElementById("voteForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const method=document.getElementById("method").value;
+  const contact=document.getElementById("contact").value.trim();
+  const button=document.getElementById("submitVote");
+  button.disabled=true;
+  message.textContent="Submitting your vote...";
+  const {error}=await db.from("votes").insert({
+    nominee_id:nomineeSelect.value,
+    "Voting method":method,
+    voter_contact:contact,
+    voter_name:document.getElementById("voterName").value.trim(),
+    verification_status:"pending"
+  });
+  button.disabled=false;
+  if(error){
+    message.textContent="Vote could not be submitted: "+error.message;
+    return;
+  }
+  message.textContent="Thank you! Your vote has been recorded as pending verification.";
+  e.target.reset();
+  await loadNominees();
+  await loadTotals();
+});
+
+async function showAdmin(){
+  const {data:{user}}=await db.auth.getUser();
+  if(!user)return;
+  if(user.email.toLowerCase()!=="khalifbrowne@gmail.com")return;
+  document.getElementById("adminArea").classList.remove("hidden");
+  document.getElementById("loginForm").classList.add("hidden");
+  await loadAdminVotes();
+}
+
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const {error}=await db.auth.signInWithPassword({
+    email:document.getElementById("adminEmail").value,
+    password:document.getElementById("adminPassword").value
+  });
+  if(error){
+    document.getElementById("adminMessage").textContent="Login failed. Check your details.";
+    return;
+  }
+  await showAdmin();
+});
+
+async function loadAdminVotes(){
+  const area=document.getElementById("votesList");
+  const {data,error}=await db.from("votes")
+    .select("voter_name,voter_contact,nominee_id,Voting method,verification_status,created_at")
+    .order("created_at",{ascending:false});
+  if(error){area.textContent="Could not load votes: "+error.message;return;}
+  const {data:nominees}=await db.from("nominees").select("id,name");
+  area.innerHTML="";
+  (data||[]).forEach(v=>{
+    const nominee=(nominees||[]).find(n=>String(n.id)===String(v.nominee_id));
+    const item=document.createElement("div");
+    item.className="nominee";
+    item.textContent=
+      "Name: "+(v.voter_name||"")+
+      " | Contact: "+(v.voter_contact||"")+
+      " | Contestant: "+(nominee?nominee.name:"Unknown")+
+      " | Method: "+v["Voting method"]+
+      " | Status: "+v.verification_status;
+    area.appendChild(item);
+  });
+}
+
+document.getElementById("addNominee").addEventListener("click",async()=>{
+  const name=document.getElementById("newNominee").value.trim();
+  if(!name)return;
+  const {error}=await db.from("nominees").insert({name});
+  document.getElementById("adminMessage").textContent=
+    error?"Could not add contestant: "+error.message:"Contestant added!";
+  if(!error){
+    document.getElementById("newNominee").value="";
+    await loadNominees();
+    await loadTotals();
+  }
+});
+
+document.getElementById("logout").addEventListener("click",async()=>{
+  await db.auth.signOut();
+  location.reload();
+});
+
+loadNominees();
+loadTotals();
+setInterval(loadTotals,30000);
+db.auth.onAuthStateChange(()=>showAdmin());
+</script>
 </body>
 </html>
