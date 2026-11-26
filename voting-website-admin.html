@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071411">
+  <title>Votar — Emite tu voto</title>
+  <style>
+    :root{--cyan:#24dfd2;--pink:#f32e61;--muted:#c4c3c7;--border:rgba(205,220,218,.22)}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px;color:#f8f8fa;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 8% 5%,rgba(0,91,76,.26),transparent 38%),radial-gradient(ellipse at 93% 94%,rgba(111,15,42,.22),transparent 35%),linear-gradient(130deg,#061411 0%,#030707 48%,#090304 100%)}
+  .panel{width:min(100%,780px);padding:44px;border:1.5px solid var(--border);border-radius:40px;background:linear-gradient(135deg,rgba(22,31,30,.9),rgba(18,20,20,.9) 48%,rgba(34,17,22,.9));box-shadow:0 24px 90px rgba(0,0,0,.38);text-align:center}
+  .translate{width:min(100%,560px);min-height:76px;margin:0 auto 32px;display:flex;align-items:center;gap:14px;padding:16px 30px;border:2px solid rgba(210,220,220,.32);border-radius:999px;background:rgba(255,255,255,.075);font-size:clamp(19px,3.4vw,26px);text-align:left}
+  .globe{font-size:30px}.brand{margin:0 0 36px;font-size:clamp(30px,5vw,43px);font-weight:800;background:linear-gradient(100deg,#88c9d7,#b7a0c6 55%,#f0a1b7);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand span{margin-right:12px;color:#91bdc9;-webkit-text-fill-color:#91bdc9}
+  h1{margin:0 0 26px;font-size:clamp(30px,5.5vw,46px);line-height:1.12}
+  .intro{max-width:650px;margin:0 auto 42px;color:var(--muted);font-size:clamp(18px,3.4vw,27px);line-height:1.42}
+  .actions{display:grid;gap:24px}.vote-button{min-height:88px;width:100%;padding:18px 22px;border:0;border-radius:29px;color:#050707;background:linear-gradient(105deg,#24e0d4 0%,#80b8c3 46%,#f32d61 100%);font:inherit;font-size:clamp(18px,3.5vw,27px);font-weight:800;line-height:1.28;cursor:pointer;transition:transform .18s ease,filter .18s ease}
+  .vote-button:hover{transform:translateY(-2px);filter:brightness(1.07)}button:focus-visible,input:focus-visible{outline:3px solid white;outline-offset:3px}
+  .footer{margin:30px 0 0;color:#aaa7aa;font-size:clamp(15px,2.8vw,21px);line-height:1.45}.dot{padding:0 5px}
+  .notice{display:none;margin:22px 0 0;padding:14px 16px;border:1px solid var(--border);border-radius:14px;color:#eee;background:rgba(0,0,0,.3);font-size:14px;line-height:1.5}.notice.show{display:block}
+  .admin-launch{margin-top:26px;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:10px 17px;background:rgba(255,255,255,.06);color:#d5d3d7;font:inherit;font-size:14px;cursor:pointer}
+  .admin-launch:hover{background:rgba(255,255,255,.12)}
+  .dashboard{display:none;width:min(100%,1000px);margin:24px auto 0;padding:28px;border:1px solid var(--border);border-radius:28px;background:rgba(12,17,16,.96);box-shadow:0 20px 70px rgba(0,0,0,.35);text-align:left}
+  .dashboard.open{display:block}.dash-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .dash-head h2{margin:0;font-size:clamp(22px,4vw,30px)}.muted{color:#aaa7aa;font-size:13px;line-height:1.5}
+  .dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+  .stat{padding:17px;border:1px solid var(--border);border-radius:17px;background:rgba(255,255,255,.045)}
+  .stat strong{display:block;font-size:28px}.stat span{color:#b9b6ba;font-size:13px}
+  .dash-card{margin-top:16px;padding:18px;border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.035)}
+  .dash-card h3{margin:0 0 14px;font-size:17px}.form-row{display:flex;gap:10px;flex-wrap:wrap}
+  input{min-width:0;flex:1;padding:13px 14px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:#101716;color:white;font:inherit}
+  .small-btn{padding:11px 15px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(255,255,255,.09);color:#fff;font:inherit;font-weight:650;cursor:pointer}
+  .small-btn.primary{border:0;background:linear-gradient(105deg,#24dfd2,#ef3c70);color:#07100f}.small-btn.danger{border-color:rgba(255,100,120,.45);color:#ffabb8}
+  .nominee-list{display:grid;gap:10px}.nominee{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:13px}
+  .nominee-name{font-weight:700;overflow-wrap:anywhere}.vote-count{color:#9fe7df;font-variant-numeric:tabular-nums;font-weight:750}
+  .empty{padding:18px;text-align:center;color:#aaa7aa;border:1px dashed rgba(255,255,255,.18);border-radius:12px}
+  .bar-wrap{height:7px;margin-top:8px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}.bar{height:100%;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+  .dash-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .warning{margin-top:16px;padding:13px 15px;border-radius:12px;background:rgba(255,190,90,.09);border:1px solid rgba(255,190,90,.25);color:#f4d7a4;font-size:13px;line-height:1.5}
+  @media(max-width:650px){body{padding:16px}.panel{padding:28px 20px;border-radius:28px}.translate{min-height:64px;padding:12px 20px;margin-bottom:27px}.brand{margin-bottom:28px}.intro{margin-bottom:32px}.vote-button{min-height:78px;border-radius:23px}.dashboard{padding:18px}.dash-grid{grid-template-columns:1fr 1fr}.nominee{grid-template-columns:minmax(0,1fr) auto}.nominee .remove{grid-column:1/-1;justify-self:end}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+  </style>
+</head>
+<body>
+  <div>
+    <main class="panel">
+      <div class="translate" aria-label="Traducir página"><span class="globe" aria-hidden="true">🌍</span><span>Traducir página</span></div>
+      <div class="brand"><span aria-hidden="true">♪</span>Votar</div>
+      <h1>Emitir Su Voto</h1>
+      <p class="intro">Tu opinión importa. Elija una opción a continuación y ayude a dar forma al resultado.</p>
+      <div class="actions">
+        <button class="vote-button" id="instagramVote" type="button">Completar La Votación En Instagram</button>
+        <button class="vote-button" id="emailVote" type="button">Completar La Votación Por Correo<br> Electrónico</button>
+      </div>
+      <p class="footer">La votación es anónima <span class="dot">·</span> Actualización de resultados en tiempo real</p>
+      <div class="notice" id="notice" role="status" aria-live="polite"></div>
+      <button class="admin-launch" id="adminToggle" type="button" aria-expanded="false">⚙ Acceso de administrador</button>
+    </main>
+
+    <section class="dashboard" id="dashboard" aria-label="Panel de administración">
+      <div class="dash-head">
+        <div><h2>Panel de administrador</h2><div class="muted">Gestiona los candidatos y revisa los resultados</div></div>
+        <button class="small-btn" id="closeDashboard" type="button">Cerrar panel</button>
+      </div>
+      <div class="dash-grid">
+        <div class="stat"><strong id="totalVotes">0</strong><span>Votos registrados</span></div>
+        <div class="stat"><strong id="candidateCount">0</strong><span>Candidatos</span></div>
+        <div class="stat"><strong id="leadingCandidate">—</strong><span>Más votado</span></div>
+      </div>
+      <div class="dash-card">
+        <h3>Añadir candidato</h3>
+        <form class="form-row" id="addForm">
+          <input id="candidateName" maxlength="60" placeholder="Nombre del candidato" aria-label="Nombre del candidato" required>
+          <button class="small-btn primary" type="submit">Añadir</button>
+        </form>
+      </div>
+      <div class="dash-card">
+        <h3>Resultados por candidato</h3>
+        <div class="nominee-list" id="nomineeList"></div>
+        <div class="dash-actions">
+          <button class="small-btn" id="exportCsv" type="button">Exportar resultados CSV</button>
+          <button class="small-btn danger" id="resetVotes" type="button">Reiniciar todos los votos</button>
+        </div>
+      </div>
+      <div class="warning"><strong>Importante:</strong> Este panel guarda los datos únicamente en este navegador y dispositivo. No es un sistema de votación online compartido ni una autenticación segura. Para contar votos reales de distintos visitantes y ver resultados en tiempo real, conecta una base de datos y un backend con acceso de administrador protegido.</div>
+    </section>
+  </div>
+
+  <script>
+    // CONFIGURA AQUÍ TUS ENLACES Y CORREO.
+    const INSTAGRAM_VOTE_URL = "";
+    const VOTE_EMAIL = "";
+
+    // Datos de demostración guardados localmente en este navegador.
+    const STORAGE_KEY = "votar_admin_demo_v1";
+    const starterData = { nominees: [] };
+    let data;
+    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || starterData; }
+    catch { data = starterData; }
+    if (!Array.isArray(data.nominees)) data = starterData;
+
+    const notice = document.getElementById("notice");
+    function showNotice(message) {
+      notice.textContent = message;
+      notice.classList.add("show");
+    }
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      renderDashboard();
+    }
+
+    document.getElementById("instagramVote").addEventListener("click", () => {
+      if (INSTAGRAM_VOTE_URL.trim()) window.open(INSTAGRAM_VOTE_URL, "_blank", "noopener,noreferrer");
+      else showNotice("El enlace de votación de Instagram aún no está configurado. Añade tu enlace en INSTAGRAM_VOTE_URL dentro del código.");
+    });
+    document.getElementById("emailVote").addEventListener("click", () => {
+      if (VOTE_EMAIL.trim()) {
+        const subject = encodeURIComponent("Mi voto");
+        const body = encodeURIComponent("Mi voto es: ");
+        window.location.href = `mailto:${VOTE_EMAIL}?subject=${subject}&body=${body}`;
+      } else showNotice("El correo aún no está configurado. Añade tu dirección en VOTE_EMAIL dentro del código.");
+    });
+
+    const dashboard = document.getElementById("dashboard");
+    const adminToggle = document.getElementById("adminToggle");
+    function setDashboard(open) {
+      dashboard.classList.toggle("open", open);
+      adminToggle.setAttribute("aria-expanded", String(open));
+      if (open) renderDashboard();
+    }
+    adminToggle.addEventListener("click", () => setDashboard(!dashboard.classList.contains("open")));
+    document.getElementById("closeDashboard").addEventListener("click", () => setDashboard(false));
+
+    function renderDashboard() {
+      const total = data.nominees.reduce((sum, n) => sum + (Number(n.votes) || 0), 0);
+      const leader = [...data.nominees].sort((a,b) => b.votes - a.votes)[0];
+      document.getElementById("totalVotes").textContent = total;
+      document.getElementById("candidateCount").textContent = data.nominees.length;
+      document.getElementById("leadingCandidate").textContent = leader && leader.votes > 0 ? leader.name : "—";
+      const list = document.getElementById("nomineeList");
+      list.replaceChildren();
+      if (!data.nominees.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Todavía no hay candidatos. Añade el primero arriba.";
+        list.append(empty);
+        return;
+      }
+      data.nominees.forEach((nominee, index) => {
+        const row = document.createElement("div");
+        row.className = "nominee";
+        const info = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "nominee-name";
+        name.textContent = nominee.name;
+        const track = document.createElement("div");
+        track.className = "bar-wrap";
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.width = (total ? Math.max(0, nominee.votes / total * 100) : 0) + "%";
+        track.append(bar); info.append(name, track);
+        const count = document.createElement("span");
+        count.className = "vote-count";
+        count.textContent = nominee.votes + " votos";
+        const remove = document.createElement("button");
+        remove.type = "button"; remove.className = "small-btn remove"; remove.textContent = "Eliminar";
+        remove.addEventListener("click", () => {
+          if (confirm(`¿Eliminar a ${nominee.name} y sus votos?`)) {
+            data.nominees.splice(index, 1); save();
+          }
+        });
+        row.append(info, count, remove);
+        list.append(row);
+      });
+    }
+
+    document.getElementById("addForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const field = document.getElementById("candidateName");
+      const name = field.value.trim();
+      if (!name) return;
+      if (data.nominees.some(n => n.name.toLowerCase() === name.toLowerCase())) {
+        showNotice("Ese candidato ya existe."); return;
+      }
+      data.nominees.push({ name, votes: 0 });
+      field.value = ""; save();
+    });
+
+    document.getElementById("resetVotes").addEventListener("click", () => {
+      if (confirm("¿Seguro que quieres reiniciar todos los contadores a cero?")) {
+        data.nominees.forEach(n => n.votes = 0); save();
+      }
+    });
+
+    document.getElementById("exportCsv").addEventListener("click", () => {
+      const rows = [["Candidato", "Votos"], ...data.nominees.map(n => [n.name, n.votes])];
+      const csv = rows.map(row => row.map(value => '"' + String(value).replace(/"/g, '""') + '"').join(",")).join("\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url; link.download = "resultados-votacion.csv"; link.click();
+      URL.revokeObjectURL(url);
+    });
+    renderDashboard();
+  </script>
+</body>
+</html>
