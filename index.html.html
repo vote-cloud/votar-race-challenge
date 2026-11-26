@@ -8,33 +8,30 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090d18;color:white;font-family:Arial,sans-serif;padding:25px 16px}
-main{max-width:650px;margin:auto}
-header{text-align:center;padding:35px 10px}
-h1{font-size:32px;letter-spacing:2px;background:linear-gradient(90deg,#20e5d1,#fa5da8);color:transparent;background-clip:text}
-.subtitle{color:#aab4c8}
-.panel{background:#151d2e;border:1px solid #29364b;border-radius:18px;padding:22px;margin:18px 0}
-h2{font-size:20px}
-label{display:block;margin:15px 0 7px;color:#cbd5e1}
+body{margin:0;background:#080d19;color:#fff;font-family:Arial,sans-serif;padding:20px}
+main{max-width:600px;margin:auto}
+header{text-align:center;padding:30px 10px}
+h1{font-size:30px;background:linear-gradient(90deg,#20e5d1,#fa5da8);background-clip:text;color:transparent}
+header p{color:#aab4c8}
+.panel{background:#151e30;border:1px solid #29364b;border-radius:18px;padding:22px;margin:20px 0}
+h2{color:#29dfd1}
+label{display:block;margin:15px 0 7px}
 input,select{width:100%;padding:14px;border-radius:10px;border:1px solid #39465c;background:#0d1423;color:white;font-size:16px}
 button{width:100%;padding:15px;border:0;border-radius:12px;margin-top:17px;background:linear-gradient(90deg,#19d9cf,#ed55a5);font-weight:bold;font-size:16px;color:#07111c}
-button:disabled{opacity:.5}
-.small{font-size:13px;color:#aab4c8;line-height:1.6}
-#message{margin-top:15px;line-height:1.5}
-.nominee{padding:12px;border-bottom:1px solid #29364b}
-a{color:#29ded2}
-.hidden{display:none}
+.note{font-size:13px;color:#aab4c8;line-height:1.6}
+.item{padding:12px;border-bottom:1px solid #39465c}
+#message,#adminMessage{margin-top:15px;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <main>
 <header>
 <h1>VOTAR RACE CHALLENGE</h1>
-<p class="subtitle">Choose your favourite contestant and cast your vote!</p>
+<p>Choose your favourite contestant and cast your vote!</p>
 </header>
 
 <section class="panel">
-<h2>🏆 Cast Your Vote</h2>
+<h2>🏆 CAST YOUR VOTE</h2>
 <form id="voteForm">
 <label>Your name</label>
 <input id="voterName" required placeholder="Enter your name">
@@ -44,31 +41,30 @@ a{color:#29ded2}
 <option value="">Loading contestants...</option>
 </select>
 
-<label>Choose voting method</label>
+<label>Voting method</label>
 <select id="method" required>
-<option value="">Select a method</option>
+<option value="">Choose method</option>
 <option value="Instagram">Instagram</option>
 <option value="Email">Email</option>
 </select>
 
-<label id="contactLabel">Instagram username or email address</label>
-<input id="contact" required placeholder="Enter your Instagram username or email">
+<label id="contactLabel">Instagram username or email</label>
+<input id="contact" required placeholder="Enter your details">
 
-<p class="small">We will never ask for your Instagram or email password. Email verification must be completed separately before an email vote can be treated as verified.</p>
-
-<button id="submitVote" type="submit">SUBMIT MY VOTE</button>
+<p class="note">Never enter your Instagram or email password. Email votes will remain pending until email ownership is verified.</p>
+<button type="submit" id="submitVote">SUBMIT MY VOTE</button>
 </form>
 <div id="message"></div>
 </section>
 
 <section class="panel">
-<h2>📊 Live Vote Totals</h2>
+<h2>📊 LIVE VOTE TOTALS</h2>
 <div id="totals">Loading totals...</div>
 </section>
 
 <section class="panel">
-<h2>🔐 Admin Dashboard</h2>
-<p class="small">For authorised VOTAR administrators only.</p>
+<h2>🔐 ADMIN DASHBOARD</h2>
+<p class="note">Authorised administrator only.</p>
 <form id="loginForm">
 <label>Admin email</label>
 <input id="adminEmail" type="email" required>
@@ -76,156 +72,123 @@ a{color:#29ded2}
 <input id="adminPassword" type="password" required>
 <button type="submit">ADMIN LOGIN</button>
 </form>
-<div id="adminArea" class="hidden">
-<h2>Submitted Votes</h2>
-<div id="votesList">Loading...</div>
-<label>Add a contestant</label>
+<div id="adminArea" style="display:none">
+<h3>Submitted votes</h3>
+<div id="votesList"></div>
+<label>Add contestant</label>
 <input id="newNominee" placeholder="Contestant name">
-<button id="addNominee">ADD CONTESTANT</button>
-<button id="logout">LOG OUT</button>
+<button type="button" id="addNominee">ADD CONTESTANT</button>
+<button type="button" id="logout">LOG OUT</button>
 </div>
 <div id="adminMessage"></div>
 </section>
 </main>
 
 <script>
-const SUPABASE_URL = "https://jybkpokdfiwogszauvnm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_9S0btlgPV_AExggBMffpOA_V99RyRrP";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db=window.supabase.createClient(
+"https://jybkpokdfiwogszauvnm.supabase.co",
+"sb_publishable_9S0btlgPV_AExggBMffpOA_V99RyRrP"
+);
 
-const nomineeSelect = document.getElementById("nominee");
-const message = document.getElementById("message");
+const nominee=document.getElementById("nominee");
 
 async function loadNominees(){
-  const {data,error} = await db.from("nominees").select("id,name").order("created_at");
-  if(error){
-    nomineeSelect.innerHTML='<option value="">Could not load contestants</option>';
-    return;
-  }
-  nomineeSelect.innerHTML='<option value="">Choose contestant</option>';
-  data.forEach(n=>{
-    const option=document.createElement("option");
-    option.value=n.id;
-    option.textContent=n.name;
-    nomineeSelect.appendChild(option);
-  });
+ const {data,error}=await db.from("nominees").select("id,name").order("created_at");
+ if(error){nominee.innerHTML='<option>Could not load contestants</option>';return;}
+ nominee.innerHTML='<option value="">Choose contestant</option>';
+ (data||[]).forEach(n=>{
+  let o=document.createElement("option");
+  o.value=n.id;o.textContent=n.name;nominee.appendChild(o);
+ });
 }
 
 async function loadTotals(){
-  const {data,error}=await db.rpc("get_vote_totals");
-  const area=document.getElementById("totals");
-  if(error){area.textContent="Vote totals are temporarily unavailable.";return;}
-  const {data:nominees}=await db.from("nominees").select("id,name");
-  area.innerHTML="";
-  (nominees||[]).forEach(n=>{
-    const item=document.createElement("div");
-    item.className="nominee";
-    const total=(data||[]).find(v=>String(v.nominee_id)===String(n.id));
-    item.textContent=n.name+" — "+(total?total.total_votes:0)+" votes";
-    area.appendChild(item);
-  });
+ const area=document.getElementById("totals");
+ const {data,error}=await db.rpc("get_vote_totals");
+ if(error){area.textContent="Vote totals unavailable.";return;}
+ const {data:people}=await db.from("nominees").select("id,name");
+ area.innerHTML="";
+ (people||[]).forEach(n=>{
+  let v=(data||[]).find(x=>String(x.nominee_id)===String(n.id));
+  let d=document.createElement("div");
+  d.className="item";
+  d.textContent=n.name+" — "+(v?v.total_votes:0)+" votes";
+  area.appendChild(d);
+ });
 }
 
-document.getElementById("method").addEventListener("change",e=>{
-  const email=e.target.value==="Email";
-  document.getElementById("contactLabel").textContent=
-    email?"Email address":"Instagram username";
-  document.getElementById("contact").placeholder=
-    email?"Enter your email address":"Enter your Instagram username";
-  document.getElementById("contact").type=email?"email":"text";
-});
+document.getElementById("method").onchange=e=>{
+ let email=e.target.value==="Email";
+ document.getElementById("contactLabel").textContent=email?"Email address":"Instagram username";
+ document.getElementById("contact").type=email?"email":"text";
+ document.getElementById("contact").placeholder=email?"Enter your email":"Enter your Instagram username";
+};
 
-document.getElementById("voteForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const method=document.getElementById("method").value;
-  const contact=document.getElementById("contact").value.trim();
-  const button=document.getElementById("submitVote");
-  button.disabled=true;
-  message.textContent="Submitting your vote...";
-  const {error}=await db.from("votes").insert({
-    nominee_id:nomineeSelect.value,
-    "Voting method":method,
-    voter_contact:contact,
-    voter_name:document.getElementById("voterName").value.trim(),
-    verification_status:"pending"
-  });
-  button.disabled=false;
-  if(error){
-    message.textContent="Vote could not be submitted: "+error.message;
-    return;
-  }
-  message.textContent="Thank you! Your vote has been recorded as pending verification.";
-  e.target.reset();
-  await loadNominees();
-  await loadTotals();
-});
+document.getElementById("voteForm").onsubmit=async e=>{
+ e.preventDefault();
+ let button=document.getElementById("submitVote");
+ let message=document.getElementById("message");
+ button.disabled=true;message.textContent="Submitting...";
+ let method=document.getElementById("method").value;
+ let {error}=await db.from("votes").insert({
+  nominee_id:nominee.value,
+  "Voting method":method,
+  voter_contact:document.getElementById("contact").value.trim(),
+  voter_name:document.getElementById("voterName").value.trim(),
+  verification_status:"pending"
+ });
+ button.disabled=false;
+ if(error){message.textContent="Error: "+error.message;return;}
+ message.textContent="Your vote was recorded and is pending verification. Thank you!";
+ e.target.reset();
+ await loadNominees();await loadTotals();
+};
 
-async function showAdmin(){
-  const {data:{user}}=await db.auth.getUser();
-  if(!user)return;
-  if(user.email.toLowerCase()!=="khalifbrowne@gmail.com")return;
-  document.getElementById("adminArea").classList.remove("hidden");
-  document.getElementById("loginForm").classList.add("hidden");
-  await loadAdminVotes();
+async function loadAdmin(){
+ let {data,error}=await db.from("votes").select("*").order("created_at",{ascending:false});
+ let area=document.getElementById("votesList");
+ if(error){area.textContent="Unable to load votes: "+error.message;return;}
+ let {data:people}=await db.from("nominees").select("id,name");
+ area.innerHTML="";
+ (data||[]).forEach(v=>{
+  let n=(people||[]).find(x=>String(x.id)===String(v.nominee_id));
+  let d=document.createElement("div");d.className="item";
+  d.textContent="Name: "+v.voter_name+" | Contact: "+v.voter_contact+" | Contestant: "+(n?n.name:"Unknown")+" | Method: "+v["Voting method"]+" | Status: "+v.verification_status;
+  area.appendChild(d);
+ });
 }
 
-document.getElementById("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const {error}=await db.auth.signInWithPassword({
-    email:document.getElementById("adminEmail").value,
-    password:document.getElementById("adminPassword").value
-  });
-  if(error){
-    document.getElementById("adminMessage").textContent="Login failed. Check your details.";
-    return;
-  }
-  await showAdmin();
-});
+document.getElementById("loginForm").onsubmit=async e=>{
+ e.preventDefault();
+ let {data,error}=await db.auth.signInWithPassword({
+  email:document.getElementById("adminEmail").value,
+  password:document.getElementById("adminPassword").value
+ });
+ let msg=document.getElementById("adminMessage");
+ if(error){msg.textContent="Login failed. Check your details.";return;}
+ if(data.user.email.toLowerCase()!=="khalifbrowne@gmail.com"){
+  await db.auth.signOut();msg.textContent="Not authorised.";return;
+ }
+ document.getElementById("adminArea").style.display="block";
+ document.getElementById("loginForm").style.display="none";
+ await loadAdmin();
+};
 
-async function loadAdminVotes(){
-  const area=document.getElementById("votesList");
-  const {data,error}=await db.from("votes")
-    .select("voter_name,voter_contact,nominee_id,Voting method,verification_status,created_at")
-    .order("created_at",{ascending:false});
-  if(error){area.textContent="Could not load votes: "+error.message;return;}
-  const {data:nominees}=await db.from("nominees").select("id,name");
-  area.innerHTML="";
-  (data||[]).forEach(v=>{
-    const nominee=(nominees||[]).find(n=>String(n.id)===String(v.nominee_id));
-    const item=document.createElement("div");
-    item.className="nominee";
-    item.textContent=
-      "Name: "+(v.voter_name||"")+
-      " | Contact: "+(v.voter_contact||"")+
-      " | Contestant: "+(nominee?nominee.name:"Unknown")+
-      " | Method: "+v["Voting method"]+
-      " | Status: "+v.verification_status;
-    area.appendChild(item);
-  });
-}
+document.getElementById("addNominee").onclick=async()=>{
+ let name=document.getElementById("newNominee").value.trim();
+ if(!name)return;
+ let {error}=await db.from("nominees").insert({name});
+ document.getElementById("adminMessage").textContent=error?error.message:"Contestant added!";
+ if(!error){document.getElementById("newNominee").value="";await loadNominees();await loadTotals();}
+};
 
-document.getElementById("addNominee").addEventListener("click",async()=>{
-  const name=document.getElementById("newNominee").value.trim();
-  if(!name)return;
-  const {error}=await db.from("nominees").insert({name});
-  document.getElementById("adminMessage").textContent=
-    error?"Could not add contestant: "+error.message:"Contestant added!";
-  if(!error){
-    document.getElementById("newNominee").value="";
-    await loadNominees();
-    await loadTotals();
-  }
-});
-
-document.getElementById("logout").addEventListener("click",async()=>{
-  await db.auth.signOut();
-  location.reload();
-});
+document.getElementById("logout").onclick=async()=>{
+ await db.auth.signOut();location.reload();
+};
 
 loadNominees();
 loadTotals();
 setInterval(loadTotals,30000);
-db.auth.onAuthStateChange(()=>showAdmin());
 </script>
 </body>
 </html>
